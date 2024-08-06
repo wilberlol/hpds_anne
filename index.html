@@ -1,0 +1,73 @@
+<?php
+$servername = "localhost";
+$username = "root";
+$password = "your_password";
+$dbname = "your_database_name";
+
+// 創建連接
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// 檢查連接
+if ($conn->connect_error) {
+    die("連接失敗: " . $conn->connect_error);
+}
+
+$sql = "SELECT student_id, gender, score, answer_time, answer_date FROM score";
+$result = $conn->query($sql);
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Score Table</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+        }
+        table#scoreTable tr:nth-child(even) {
+            background-color: #eee;
+        }
+        table#scoreTable tr:nth-child(odd) {
+            background-color: #fff;
+        }
+        table#scoreTable th {
+            background-color: black;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Score Table</h2>
+
+<table id="scoreTable">
+    <tr>
+        <th>Student ID</th>
+        <th>Gender</th>
+        <th>Score</th>
+        <th>Answer Time</th>
+        <th>Answer Date</th>
+    </tr>
+    <?php
+    if ($result->num_rows > 0) {
+        // 輸出數據
+        while($row = $result->fetch_assoc()) {
+            echo "<tr><td>" . $row["student_id"]. "</td><td>" . $row["gender"]. "</td><td>" . $row["score"]. "</td><td>" . $row["answer_time"]. "</td><td>" . $row["answer_date"]. "</td></tr>";
+        }
+    } else {
+        echo "<tr><td colspan='5'>沒有數據</td></tr>";
+    }
+    $conn->close();
+    ?>
+</table>
+
+</body>
+</html>
