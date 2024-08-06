@@ -1,73 +1,66 @@
-<?php
-$servername = "localhost";
-$username = "root";
-$password = "your_password";
-$dbname = "your_database_name";
-
-// 創建連接
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// 檢查連接
-if ($conn->connect_error) {
-    die("連接失敗: " . $conn->connect_error);
-}
-
-$sql = "SELECT student_id, gender, score, answer_time, answer_date FROM score";
-$result = $conn->query($sql);
-?>
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Score Table</title>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        table, th, td {
-            border: 1px solid black;
-        }
-        th, td {
-            padding: 15px;
-            text-align: left;
-        }
-        table#scoreTable tr:nth-child(even) {
-            background-color: #eee;
-        }
-        table#scoreTable tr:nth-child(odd) {
-            background-color: #fff;
-        }
-        table#scoreTable th {
-            background-color: black;
-            color: white;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data from MySQL</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <h1>Users and Scores Data</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Student ID</th>
+                <th>Password</th>
+                <th>Gender</th>
+                <th>Score</th>
+                <th>Answer Time</th>
+                <th>Answer Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            // Database credentials
+            $servername = "fgserver2.ddns.net";
+            $username = "root";
+            $password = "12qwaszx1qaz2wsx";
+            $dbname = "hpds_anne";
+            $port = "3306";
 
-<h2>Score Table</h2>
+            // Create connection
+            $conn = new mysqli($servername, $username, $password, $dbname, $port);
 
-<table id="scoreTable">
-    <tr>
-        <th>Student ID</th>
-        <th>Gender</th>
-        <th>Score</th>
-        <th>Answer Time</th>
-        <th>Answer Date</th>
-    </tr>
-    <?php
-    if ($result->num_rows > 0) {
-        // 輸出數據
-        while($row = $result->fetch_assoc()) {
-            echo "<tr><td>" . $row["student_id"]. "</td><td>" . $row["gender"]. "</td><td>" . $row["score"]. "</td><td>" . $row["answer_time"]. "</td><td>" . $row["answer_date"]. "</td></tr>";
-        }
-    } else {
-        echo "<tr><td colspan='5'>沒有數據</td></tr>";
-    }
-    $conn->close();
-    ?>
-</table>
+            // Check connection
+            if ($conn->connect_error) {
+                die("Connection failed: " . $conn->connect_error);
+            }
 
+            // SQL query to fetch data from users and score tables
+            $sql = "SELECT u.student_id, u.password, s.gender, s.score, s.answer_time, s.answer_date 
+                    FROM users u
+                    JOIN score s ON u.student_id = s.student_id";
+            $result = $conn->query($sql);
+
+            if ($result->num_rows > 0) {
+                // Output data of each row
+                while($row = $result->fetch_assoc()) {
+                    $masked_password = str_repeat('*', strlen($row['password']));
+                    echo "<tr>
+                            <td>{$row['student_id']}</td>
+                            <td>{$masked_password}</td>
+                            <td>{$row['gender']}</td>
+                            <td>{$row['score']}</td>
+                            <td>{$row['answer_time']}</td>
+                            <td>{$row['answer_date']}</td>
+                          </tr>";
+                }
+            } else {
+                echo "<tr><td colspan='6'>No data found</td></tr>";
+            }
+            $conn->close();
+            ?>
+        </tbody>
+    </table>
 </body>
 </html>
