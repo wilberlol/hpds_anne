@@ -21,7 +21,7 @@
 </head>
 <body>
     <h1>HPDS Anne 數據展示</h1>
-    <table>
+    <table id="dataTable">
         <thead>
             <tr>
                 <th>學號</th>
@@ -32,48 +32,28 @@
                 <th>答題日期</th>
             </tr>
         </thead>
-        <tbody>
-            <?php
-            // Database credentials
-            $servername = "fgserver2.ddns.net";
-            $username = "root";
-            $password = "12qwaszx1qaz2wsx";
-            $dbname = "hpds_anne";
-            $port = "3306";
-
-            // Create connection
-            $conn = new mysqli($servername, $username, $password, $dbname, $port);
-
-            // Check connection
-            if ($conn->connect_error) {
-                die("Connection failed: " . $conn->connect_error);
-            }
-
-            // SQL query to fetch data from users and score tables
-            $sql = "SELECT u.student_id, u.password, s.gender, s.score, s.answer_time, s.answer_date 
-                    FROM users u
-                    JOIN score s ON u.student_id = s.student_id";
-            $result = $conn->query($sql);
-
-            if ($result->num_rows > 0) {
-                // Output data of each row
-                while($row = $result->fetch_assoc()) {
-                    $masked_password = str_repeat('*', strlen($row['password']));
-                    echo "<tr>
-                            <td>{$row['student_id']}</td>
-                            <td>{$masked_password}</td>
-                            <td>{$row['gender']}</td>
-                            <td>{$row['score']}</td>
-                            <td>{$row['answer_time']}</td>
-                            <td>{$row['answer_date']}</td>
-                          </tr>";
-                }
-            } else {
-                echo "<tr><td colspan='6'>No data found</td></tr>";
-            }
-            $conn->close();
-            ?>
+        <tbody id="tableBody">
+            <!-- 數據將在這裡動態插入 -->
         </tbody>
     </table>
+
+    <script>
+        // 從PHP腳本獲取數據並顯示
+        fetch('getData.php')
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.getElementById('tableBody');
+                data.forEach(item => {
+                    const row = tableBody.insertRow();
+                    row.insertCell(0).textContent = item.student_id;
+                    row.insertCell(1).textContent = item.password; // 已在PHP中轉換為星號
+                    row.insertCell(2).textContent = item.gender;
+                    row.insertCell(3).textContent = item.score;
+                    row.insertCell(4).textContent = item.answer_time;
+                    row.insertCell(5).textContent = item.answer_date;
+                });
+            })
+            .catch(error => console.error('Error:', error));
+    </script>
 </body>
 </html>
